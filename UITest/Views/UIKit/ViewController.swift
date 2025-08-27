@@ -124,6 +124,7 @@ class ViewController: UIViewController {
     }
 
     @objc func returnHomeTapped() {
-        navigationController?.popViewController(animated: true)
+       let homeVC = HomeViewController()
+        navigationController?.pushViewController(homeVC, animated: true)
     }
 }
