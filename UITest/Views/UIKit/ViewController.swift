@@ -8,16 +8,15 @@ class ViewController: UIViewController {
     let groupCountLabel = UILabel()
 
     let scanner = PhotoScanner()
-    
-    // Added Start Scan button
+
     var startScanButton: UIButton!
+    var returnHomeButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .white
         setupUI()
-        // Removed automatic scan trigger here
     }
 
     func setupUI() {
@@ -31,10 +30,16 @@ class ViewController: UIViewController {
         startScanButton.setTitle("Start Scan", for: .normal)
         startScanButton.addTarget(self, action: #selector(startScanButtonTapped), for: .touchUpInside)
 
+        returnHomeButton = UIButton(type: .system)
+        returnHomeButton.translatesAutoresizingMaskIntoConstraints = false
+        returnHomeButton.setTitle("Return to Home", for: .normal)
+        returnHomeButton.addTarget(self, action: #selector(returnHomeTapped), for: .touchUpInside)
+
         view.addSubview(progressBar)
         view.addSubview(progressLabel)
         view.addSubview(groupCountLabel)
         view.addSubview(startScanButton)
+        view.addSubview(returnHomeButton)
 
         NSLayoutConstraint.activate([
             progressBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
@@ -47,9 +52,12 @@ class ViewController: UIViewController {
             groupCountLabel.topAnchor.constraint(equalTo: progressLabel.bottomAnchor, constant: 30),
             groupCountLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             groupCountLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
+
             startScanButton.topAnchor.constraint(equalTo: groupCountLabel.bottomAnchor, constant: 40),
             startScanButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            returnHomeButton.topAnchor.constraint(equalTo: startScanButton.bottomAnchor, constant: 20),
+            returnHomeButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
 
         progressBar.progress = 0.0
@@ -96,7 +104,6 @@ class ViewController: UIViewController {
             self.progressBar.progress = percent
             self.progressLabel.text = String(format: "Scanning photos: %.0f%% (%d/%d)", percent * 100, processed, total)
 
-            // Update group counts display
             var groupText = "Group Counts:\n"
             for group in PhotoGroup.allCases.sorted(by: { $0.rawValue < $1.rawValue }) {
                 if let count = groupCounts[group], count > 0 {
@@ -109,11 +116,14 @@ class ViewController: UIViewController {
         scanner.onScanComplete = {
             DispatchQueue.main.async {
                 print("Scan complete!")
-                self.scanButton.isHidden = true
+                self.startScanButton.isHidden = true
             }
+        }
 
         scanner.startScan()
     }
+
+    @objc func returnHomeTapped() {
+        navigationController?.popViewController(animated: true)
+    }
 }
-
-
